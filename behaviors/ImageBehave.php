@@ -41,7 +41,14 @@ class ImageBehave extends Behavior
      */
     public function attachImage($absolutePath, $isMain = false, $name = '')
     {
+        $uploadfile = false;
+        
         if(!preg_match('#http#', $absolutePath)){
+            $uploadfile = UploadedFile::getInstance($this, $absolutePath);
+            if($uploadfile) {
+                $absolutePath = $this->getModule()->getStorePath().$uploadfile->name;
+                $uploadfile->saveAs($absolutePath);
+            }
             if (!file_exists($absolutePath)) {
                 throw new \Exception('File not exist! :'.$absolutePath);
             }
@@ -110,7 +117,8 @@ class ImageBehave extends Behavior
             $this->setMainImage($image);
         }
 
-
+        if($uploadfile) unlink($absolutePath);
+        
         return $image;
     }
 
